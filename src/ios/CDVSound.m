@@ -25,6 +25,7 @@
 #define HTTPS_SCHEME_PREFIX @"https://"
 #define CDVFILE_PREFIX @"cdvfile://"
 #define RECORDING_WAV @"wav"
+#define FILE_SCHEME_PREFIX @"file://"
 
 @implementation CDVSound
 
@@ -78,6 +79,18 @@
 {
     NSURL* resourceURL = nil;
     NSString* filePath = nil;
+
+    // Might already start with file://, in which case we'll
+    // simply validate that it exists and return it
+    if ([resourcePath hasPrefix:FILE_SCHEME_PREFIX]) {
+        // try to access file
+        NSFileManager* fMgr = [NSFileManager defaultManager];
+        if (![fMgr fileExistsAtPath:resourcePath]) {
+            NSLog(@"Unknown resource '%@'", resourcePath);
+            return nil;
+        }
+        return resourcePath;
+    }
 
     // first try to find HTTP:// or Documents:// resources
 
