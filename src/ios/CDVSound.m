@@ -83,16 +83,18 @@
     // Might already start with file://, in which case we'll
     // simply validate that it exists and return it
     if ([resourcePath hasPrefix:FILE_SCHEME_PREFIX]) {
+        resourceURL = [NSURL URLWithString:resourcePath];
+        filePath = resourceURL.path;
         // try to access file
         NSFileManager* fMgr = [NSFileManager defaultManager];
-        if (![fMgr fileExistsAtPath:resourcePath]) {
+        if (![fMgr fileExistsAtPath:filePath]) {
             NSLog(@"Unknown resource '%@'", resourcePath);
             return nil;
         }
-        return resourcePath;
+        return resourceURL;
     }
 
-    // first try to find HTTP:// or Documents:// resources
+    // Now try to find HTTP:// or Documents:// resources
 
     if ([resourcePath hasPrefix:HTTP_SCHEME_PREFIX] || [resourcePath hasPrefix:HTTPS_SCHEME_PREFIX]) {
         // if it is a http url, use it
